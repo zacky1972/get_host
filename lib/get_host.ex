@@ -127,4 +127,41 @@ defmodule GetHost do
   defp run_hostname_with_suitable_option({:win32, _}, hostname_cmd) do
     System.cmd(hostname_cmd, [])
   end
+
+  @doc """
+  Converts a hostname to its fully qualified form based on the platform.
+
+  This function handles hostname resolution differently based on the operating system:
+  * On Unix-like systems (macOS, Linux): Returns the hostname as is
+  * On Windows: Uses `ping` command to resolve the hostname to its IP address
+
+  ## Parameters
+
+    * `platform` - The platform tuple `{:unix, _}` or `{:win32, _}`
+    * `hostname` - The hostname to convert
+
+  ## Returns
+
+    * `{:ok, ip}` - Returns the IP address as a string if successful
+    * `{:error, reason}` - Returns an error tuple with a `reason` if the resolution fails
+  """
+  @spec to_fully_qualified_hostname({atom(), atom()}, binary()) ::
+          {:ok, binary()} | {:error, binary()}
+  def to_fully_qualified_hostname({:unix, _}, hostname), do: {:ok, hostname}
+
+  def to_fully_qualified_hostname(platform = {:win32, _}, hostname) do
+    case ping_raw_oneshot(platform, hostname) do
+      {:error, reason} ->
+        {:error, reason}
+
+      {:ok, result} ->
+        result
+        |> String.trim()
+        |> String.split("\n")
+        |> Enum.at(1)
+        |> then(&Regex.named_captures(~r/Reply from (?<ip>[0-9a-f:.]+)/, &1))
+        |> Map.get("ip")
+        |> then(&{:ok, &1})
+    end
+  end
 end
