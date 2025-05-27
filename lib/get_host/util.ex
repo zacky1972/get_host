@@ -6,6 +6,70 @@ defmodule GetHost.Util do
   require Logger
 
   @doc """
+  Expands an IPv6 address to its full form.
+
+  This function handles two types of IPv6 addresses:
+  * Fully specified addresses (e.g., "2001:db8:1:2:3:4:5:6")
+  * Compressed addresses with "::" (e.g., "2001:db8::1")
+
+  The function expands compressed addresses by:
+  1. Splitting the address at "::"
+  2. Calculating the number of missing segments
+  3. Inserting "0000" for each missing segment
+  4. Padding each segment to 4 characters with leading zeros
+
+  ## Parameters
+
+    * `hostname` - The IPv6 address to expand
+
+  ## Returns
+
+    * `binary()` - The expanded IPv6 address, or the original string if not an IPv6 address
+
+  ## Examples
+
+      iex> GetHost.Util.expand_ipv6("2001:db8::1")
+      "2001:0db8:0000:0000:0000:0000:0000:0001"
+
+      iex> GetHost.Util.expand_ipv6("2001:db8:1:2:3:4:5:6")
+      "2001:0db8:0001:0002:0003:0004:0005:0006"
+
+      iex> GetHost.Util.expand_ipv6("not-an-ipv6")
+      "not-an-ipv6"
+  """
+  @spec expand_ipv6(binary()) :: binary()
+  def expand_ipv6(hostname) do
+    cond do
+      Regex.match?(~r/^([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}$/, hostname) ->
+        hostname
+        |> String.split(":")
+        |> Enum.map(&"000#{&1}")
+        |> Enum.map_join(":", &String.slice(&1, -4..-1))
+
+      Regex.match?(~r/^([0-9a-f]{1,4}[:]{1,2})+[0-9a-f]{1,4}$/, hostname) ->
+        hostname
+        |> String.split("::")
+        |> Enum.map(&String.split(&1, ":"))
+        |> Enum.map(&{&1, Enum.count(&1)})
+        |> Enum.unzip()
+        |> then(fn {l, n} ->
+          [
+            Enum.at(l, 0),
+            1..(8 - Enum.sum(n))
+            |> Enum.map(fn _ -> "0" end),
+            Enum.at(l, 1)
+          ]
+        end)
+        |> List.flatten()
+        |> Enum.join(":")
+        |> expand_ipv6()
+
+      true ->
+        hostname
+    end
+  end
+
+  @doc """
   Finds the path to the `hostname` executable in the system.
 
   ## Returns
