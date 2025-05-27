@@ -14,7 +14,11 @@ defmodule GetHost.MixProject do
       # Docs
       name: "GetHost",
       source_url: @source_url,
-      docs: &docs/0
+      docs: &docs/0,
+
+      # Hex
+      description: description(),
+      package: package()
     ]
   end
 
@@ -38,7 +42,18 @@ defmodule GetHost.MixProject do
   defp docs do
     [
       main: "GetHost",
-      extras: ["README.md"]
+      extras: ["README.md", "LICENSE"]
+    ]
+  end
+
+  defp description do
+    "GetHost: A cross-platform Elixir library for retrieving the fully qualified hostname of a system."
+  end
+
+  defp package do
+    [
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 end
