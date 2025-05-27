@@ -38,6 +38,51 @@ defmodule GetHost do
   end
 
   @doc """
+  Executes a single ping to the specified hostname without DNS resolution.
+
+  This function executes the `ping` command with different options based on the operating system:
+  * On Unix-like systems (macOS, Linux): Uses `-n -c 1` options to prevent DNS resolution and send one packet
+  * On Windows: Uses `/a /n 1` options for address resolution and a single ping
+
+  ## Parameters
+
+    * `hostname` - The hostname or IP address to ping
+
+  ## Returns
+
+    * `{:ok, result}` - Returns the ping command output as a string if successful
+    * `{:error, reason}` - Returns an error tuple with a `reason` if the command fails or executable is not found
+  """
+  @spec ping_raw_oneshot(binary()) :: {:ok, binary()} | {:error, binary()}
+  def ping_raw_oneshot(hostname), do: ping_raw_oneshot_sub(:os.type(), hostname)
+
+  defp ping_raw_oneshot_sub({:unix, _}, hostname) do
+    case ping_executable() do
+      {:error, reason} ->
+        {:error, reason}
+
+      {:ok, ping_cmd} ->
+        case System.cmd(ping_cmd, ["-n", "-c", "1", hostname]) do
+          {result, 0} -> {:ok, result}
+          _ -> {:error, "Fail to execute the \"ping\" command."}
+        end
+    end
+  end
+
+  defp ping_raw_oneshot_sub({:win32, _}, hostname) do
+    case ping_executable() do
+      {:error, reason} ->
+        {:error, reason}
+
+      {:ok, ping_cmd} ->
+        case System.cmd(ping_cmd, ["/a", "/n", "1", hostname]) do
+          {result, 0} -> {:ok, result}
+          _ -> {:error, "Fail to execute the \"ping\" command."}
+        end
+    end
+  end
+
+  @doc """
   Gets the short hostname of the system using platform-specific options.
 
   This function executes the `hostname` command with different options based on the operating system:

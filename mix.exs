@@ -14,7 +14,7 @@ defmodule GetHost.MixProject do
       # Docs
       name: "GetHost",
       source_url: @source_url,
-      docs: &docs/0,
+      docs: &docs/0
     ]
   end
 
