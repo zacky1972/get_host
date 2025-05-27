@@ -37,7 +37,8 @@ defmodule GetHost do
   @spec short_name() :: {:ok, binary()} | {:error, binary()}
   def short_name do
     case hostname_executable() do
-      {:error, reason} -> {:error, reason}
+      {:error, reason} ->
+        {:error, reason}
 
       {:ok, hostname_cmd} ->
         Logger.debug("os.type: #{inspect(:os.type())}")
@@ -48,7 +49,8 @@ defmodule GetHost do
             Logger.debug("short hostname: #{hostname}")
             {:ok, hostname}
 
-          _ -> {:error, "Fail to execute the \"hostname\" command."}
+          _ ->
+            {:error, "Fail to execute the \"hostname\" command."}
         end
     end
   end
