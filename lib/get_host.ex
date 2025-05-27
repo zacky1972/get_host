@@ -22,6 +22,22 @@ defmodule GetHost do
   end
 
   @doc """
+  Finds the path to the `ping` executable in the system.
+
+  ## Returns
+
+    * `{:ok, path}` - Returns the full `path` to the ping executable if found
+    * `{:error, reason}` - Returns an error tuple with a `reason` if the executable is not found
+  """
+  @spec ping_executable() :: {:ok, binary()} | {:error, binary()}
+  def ping_executable do
+    case System.find_executable("ping") do
+      nil -> {:error, "Not found \"ping\""}
+      ping_cmd -> {:ok, ping_cmd}
+    end
+  end
+
+  @doc """
   Gets the short hostname of the system using platform-specific options.
 
   This function executes the `hostname` command with different options based on the operating system:
