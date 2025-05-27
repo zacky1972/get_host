@@ -39,7 +39,7 @@ defmodule GetHost do
     case hostname_executable() do
       {:error, reason} -> {:error, reason}
 
-      {:ok, hostname_cmd} -> 
+      {:ok, hostname_cmd} ->
         Logger.debug("os.type: #{inspect(:os.type())}")
 
         case run_hostname_with_suitable_option(:os.type(), hostname_cmd) do
@@ -51,7 +51,7 @@ defmodule GetHost do
           _ -> {:error, "Fail to execute the \"hostname\" command."}
         end
     end
-  end   
+  end
 
   defp run_hostname_with_suitable_option({:unix, :darwin}, hostname_cmd) do
     System.cmd(hostname_cmd, ["-f"])
