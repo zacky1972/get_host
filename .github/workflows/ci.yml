@@ -1,0 +1,129 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Elixir CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test-latest:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            elixir-version: '1.18.4'
+            otp-version: '27.3.4'
+
+    name: Build and test on ${{ matrix.os }} ${{ matrix.elixir-version }} ${{ matrix.otp-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@8aa8a857c6be0daae6e97272bb299d5b942675a4
+      id: setup-beam
+      with:
+        elixir-version: ${{ matrix.elixir-version }}
+        otp-version: ${{ matrix.otp-version }}
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Check format
+      run: mix format --check-formatted --migrate
+    - name: Check by the new type system
+      run: mix compile --all-warnings --warnings-as-errors --no-compile
+    - name: Run tests
+      run: mix test
+    - name: Run Credo
+      run: mix credo --strict
+    - name: Check documents
+      run: mix docs --warning-as-errors
+      
+  build-and-test-ubuntu:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            elixir-version: '1.17.3'
+            otp-version: '27.3.4'
+          - os: ubuntu-22.04
+            elixir-version: '1.16.3'
+            otp-version: '26.2.5.12'
+          - os: ubuntu-22.04
+            elixir-version: '1.15.8'
+            otp-version: '25.3.2.12'
+
+    name: Build and test on ${{ matrix.os }} ${{ matrix.elixir-version }} ${{ matrix.otp-version }}
+    needs: build-and-test-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@8aa8a857c6be0daae6e97272bb299d5b942675a4
+      id: setup-beam
+      with:
+        elixir-version: ${{ matrix.elixir-version }}
+        otp-version: ${{ matrix.otp-version }}
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Run tests
+      run: mix test
+
+  build-and-test-windows:
+    strategy:
+      matrix:
+        include:
+          - os: windows-2022
+            elixir-version: '1.18.4'
+            otp-version: '27.3.4'
+          - os: windows-2019
+            elixir-version: '1.18.4'
+            otp-version: '27.3.4'
+
+    name: Build and test on ${{ matrix.os }} ${{ matrix.elixir-version }} ${{ matrix.otp-version }}
+    needs: build-and-test-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@8aa8a857c6be0daae6e97272bb299d5b942675a4
+      id: setup-beam-windows
+      with:
+        elixir-version: ${{ matrix.elixir-version }}
+        otp-version: ${{ matrix.otp-version }}
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Run tests
+      run: mix test
