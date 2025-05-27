@@ -1,6 +1,37 @@
 defmodule GetHost do
   @moduledoc """
-  Documentation for `GetHost`.
+  A cross-platform Elixir library for retrieving the fully qualified hostname of a system.
+
+  This module provides a unified interface for getting hostname information across different
+  operating systems (macOS, Linux, and Windows). It handles platform-specific behavior and
+  provides consistent results regardless of the underlying operating system.
+
+  ## Platform-Specific Behavior
+
+  The module handles hostname resolution differently based on the operating system:
+
+  * On macOS: Returns the fully qualified domain name of the localhost
+  * On Linux, Windows: Returns the IPv4 address or the expanded IPv6 address of the localhost
+
+  ## Examples
+
+      > GetHost.name()
+      {:ok, "example.com"}  # On macOS
+      {:ok, "192.168.1.1"}  # On Linux/Windows
+
+  ## Error Handling
+
+  The module returns error tuples in case of failures:
+
+      > GetHost.name()
+      {:error, "Not found \"hostname\""}  # When hostname command is not available
+      {:error, "Fail to execute the \"hostname\" command."}  # When command execution fails
+
+  ## Dependencies
+
+  The module requires the following system commands to be available:
+  * `hostname` - For getting the system hostname
+  * `ping` - For resolving hostnames on Windows systems
   """
 
   require Logger
