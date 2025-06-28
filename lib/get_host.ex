@@ -31,7 +31,7 @@ defmodule GetHost do
 
   The module requires the following system commands to be available:
   * `hostname` - For getting the system hostname
-  * `ping` - For resolving hostnames on Windows systems
+  * `ping` - For resolving hostname on Windows systems
   """
 
   require Logger
