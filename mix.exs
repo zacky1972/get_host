@@ -69,7 +69,7 @@ defmodule GetHost.MixProject do
   defp docs do
     [
       main: "GetHost",
-      extras: ["README.md", "LICENSE"]
+      extras: ["README.md", "LICENSE.md"]
     ]
   end
 
