@@ -31,7 +31,7 @@ defmodule GetHost do
 
   The module requires the following system commands to be available:
   * `hostname` - For getting the system hostname
-  * `ping` - For resolving hostnames on Windows systems
+  * `ping` - For resolving hostname on Windows systems
   """
 
   require Logger
@@ -49,7 +49,7 @@ defmodule GetHost do
     * `{:error, reason}` - Returns an error tuple with a `reason` if any step fails
   """
   @spec name() :: {:ok, binary()} | {:error, binary()}
-  def name do
+  def name() do
     case GetHost.Util.short_name() do
       {:error, reason} ->
         {:error, reason}

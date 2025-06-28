@@ -78,7 +78,7 @@ defmodule GetHost.Util do
     * `{:error, reason}` - Returns an error tuple with a `reason` if the executable is not found
   """
   @spec hostname_executable() :: {:ok, binary()} | {:error, binary()}
-  def hostname_executable do
+  def hostname_executable() do
     case System.find_executable("hostname") do
       nil -> {:error, "Not found \"hostname\""}
       hostname_cmd -> {:ok, hostname_cmd}
@@ -94,7 +94,7 @@ defmodule GetHost.Util do
     * `{:error, reason}` - Returns an error tuple with a `reason` if the executable is not found
   """
   @spec ping_executable() :: {:ok, binary()} | {:error, binary()}
-  def ping_executable do
+  def ping_executable() do
     case System.find_executable("ping") do
       nil -> {:error, "Not found \"ping\""}
       ping_cmd -> {:ok, ping_cmd}
@@ -160,7 +160,7 @@ defmodule GetHost.Util do
     * `{:error, reason}` - Returns an error tuple with a `reason` if the command fails or executable is not found
   """
   @spec short_name() :: {:ok, binary()} | {:error, binary()}
-  def short_name do
+  def short_name() do
     case hostname_executable() do
       {:error, reason} ->
         {:error, reason}
