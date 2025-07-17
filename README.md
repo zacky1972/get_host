@@ -46,6 +46,7 @@ be found at <https://hexdocs.pm/get_host>.
 * Ubuntu 22.04 / Elixir 1.15 / OTP 25
 * Windows 2022 / Elixir 1.19 / OTP 28
 * Windows 2022 / Elixir 1.18 / OTP 28
+* macOS Sonoma on Apple Silicon / Elixir 1.18 / OTP 28
 
 ## License
 
